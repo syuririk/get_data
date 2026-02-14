@@ -11,10 +11,10 @@ with open(here / "requirements.txt") as f:
 setup(
     name="get_data",
     version="0.1.0",
-    packages=find_packages(include=["funcs", "funcs.*"]),  # funcs 포함
+    packages=find_packages(include=["funcs", "funcs.*"]),  # funcs 전체 포함
     include_package_data=True,
     install_requires=requirements,
-    description="Get data from ECOS",
+    description="Get data from ECOS and other sources",
     long_description=long_description,
     long_description_content_type="text/markdown",
     python_requires=">=3.8",
