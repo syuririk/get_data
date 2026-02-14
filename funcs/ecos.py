@@ -1,13 +1,11 @@
 import requests
 import pandas as pd
 import re
-KEY = None
+
 
 class EcosAPI:
     def __init__(self, key):
         self.key = key
-
-
 
     def get_req(self, url):
         """
@@ -71,7 +69,7 @@ class EcosAPI:
         5. If item retrieval fails or the structure is unexpected:
             - Prints the original table metadata instead.
         """
-        url = f"https://ecos.bok.or.kr/api/StatisticTableList/{KEY}/json/kr/1/1000"
+        url = f"https://ecos.bok.or.kr/api/StatisticTableList/{self.key}/json/kr/1/1000"
         all_data = self.get_req(url)
 
         candidate_dict = {}
@@ -79,7 +77,7 @@ class EcosAPI:
             if keyword in val['STAT_NAME']:
                 candidate_dict[val['STAT_NAME']] = val
         for key, val in candidate_dict.items():
-            url_d = f"https://ecos.bok.or.kr/api/StatisticItemList/{KEY}/json/kr/1/1000/{val['STAT_CODE']}"
+            url_d = f"https://ecos.bok.or.kr/api/StatisticItemList/{self.key}/json/kr/1/1000/{val['STAT_CODE']}"
             detail = self.get_req(url_d)
             print(key, " : ")
             try:
@@ -162,9 +160,9 @@ class EcosAPI:
             raise Exception(f"len of code is more than 2 : {len(code)}")
 
         if code2 == None:
-            url = f"https://ecos.bok.or.kr/api/StatisticSearch/{KEY}/json/kr/1/100000/{code1}/{period}/{start_date}/{end_date}"
+            url = f"https://ecos.bok.or.kr/api/StatisticSearch/{self.key}/json/kr/1/100000/{code1}/{period}/{start_date}/{end_date}"
         else:
-            url = f"https://ecos.bok.or.kr/api/StatisticSearch/{KEY}/json/kr/1/100000/{code1}/{period}/{start_date}/{end_date}/{code2}"
+            url = f"https://ecos.bok.or.kr/api/StatisticSearch/{self.key}/json/kr/1/100000/{code1}/{period}/{start_date}/{end_date}/{code2}"
 
         data = self.get_req(url)
 
