@@ -1,3 +1,9 @@
+import requests
+import pandas as pd
+import re
+KEY = None
+
+
 def key_set(key):
   '''
     Set a key for Ecos API
