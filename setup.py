@@ -1,25 +1,15 @@
-import setuptools
+from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
-setuptools.setup(
-    name="get_data", 
-    version="1.0.0",
-    author="syuririk",
-    description="get data from apis",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/syuririk/get_data",
-    packages=setuptools.find_packages(),
+setup(
+    name="get_data",
+    version="0.1.0",
+    packages=find_packages(include=["get_data_func", "get_data_func.*"]),
     install_requires=[
-        'pandas',
-        're',
-        'requests'
+        requests=2.32.4,
+        pandas=2.2.2
     ],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.8",
+    include_package_data=True,
+    description="Get data from ECOS",
+    long_description=open("README.md", encoding="utf-8").read(),
+    long_description_content_type="text/markdown",
 )
