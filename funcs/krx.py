@@ -200,6 +200,8 @@ class Krx:
         ticker_period = self.build_ticker_periods(df=df)
         return ticker_period
 
+  
+
     def get_combined_ohlcv(self, df=pd.DataFrame):
         """
         Combine OHLCV data for all tickers in a long format based on code and active periods.
@@ -223,36 +225,50 @@ class Krx:
         4. Concatenate all tickers into one long DataFrame.
         5. Sort by date and code.
         """
-        df_compressed = self.compress_periods(df)
-        all_dfs = []
-        code_len = len(list(df.iterrows()))
 
+        if df.empty:
+            return pd.DataFrame(columns=['date', 'code', 'open', 'high', 'low', 'close', 'volume'])
+
+        df['orig_start'] = df['start']
+        df['orig_end'] = df['end']
+
+        df_compressed = self.compress_periods(df)
+
+        all_dfs = []
+        code_len = len(list(df_compressed.iterrows()))
         count = 0
+
         for _, row in df_compressed.iterrows():
-            count += 1 
-            if count%10 == 0:
+            count += 1
+            if count % 10 == 0:
                 print(f"{count}/{code_len}")
+
             code = row['code']
             start = row['start']
             end = row['end']
-            try:
-              ohlcv = stock.get_market_ohlcv_by_date(start, end, code)
-              ohlcv = ohlcv.reset_index().rename(columns={
-                  "날짜": "date", "시가": "open", "고가": "high", "저가": "low", "종가": "close", "거래량": "volume",
-              })
-              ohlcv = ohlcv[['date', 'open', 'high', 'low', 'close', 'volume']]
-              ohlcv['code'] = code
-            except:
-              try:
-                ohlcv = stock.get_index_ohlcv_by_date(start, end, code).reset_index()
-                ohlcv = ohlcv.reset_index().rename(columns={
-                    "날짜": "date", "시가": "open", "고가": "high", "저가": "low", "종가": "close", "거래량": "volume",
-                })
-                ohlcv = ohlcv[['date', 'open', 'high', 'low', 'close', 'volume']]
-                ohlcv['code'] = code
-              except:
-                raise KeyError(f"Can't find code : {code}")
-            
+
+            ohlcv = stock.get_market_ohlcv_by_date(start, end, code)
+
+            ohlcv = ohlcv.reset_index().rename(columns={
+                "시가": "open",
+                "고가": "high",
+                "저가": "low",
+                "종가": "close",
+                "거래량": "volume",
+            })
+            ohlcv['code'] = code
+            ohlcv = ohlcv[['날짜', 'code', 'open', 'high', 'low', 'close', 'volume']]
+            ohlcv = ohlcv.rename(columns={'날짜':'date'})
+            ohlcv['date'] = pd.to_datetime(ohlcv['date'])
+
+            periods = df[df['code'] == code][['orig_start','orig_end']]
+            mask = pd.Series(False, index=ohlcv.index)
+            for _, p in periods.iterrows():
+                orig_start = pd.to_datetime(p['orig_start'])
+                orig_end = pd.to_datetime(p['orig_end'])
+                mask |= (ohlcv['date'] >= orig_start) & (ohlcv['date'] <= orig_end)
+            ohlcv = ohlcv[mask]
+
             all_dfs.append(ohlcv)
 
         final_df = pd.concat(all_dfs, ignore_index=True)
@@ -291,3 +307,30 @@ class Krx:
         })
         df = self.get_combined_ohlcv(com_df)
         return df
+    def get_index_deposit_df(self, ticker=str, start_date=str, end_date=str):
+      """
+      Retrieve component changes for a given index ticker and calculate active periods.
+
+      Parameters
+      ----------
+      tickers : list of str
+          List of ticker codes to query.
+      start_date : str
+          Start date in "YYYYMMDD" format.
+      end_date : str
+          End date in "YYYYMMDD" format.
+
+      Returns
+      -------
+      pd.DataFrame
+          Long-format OHLCV DataFrame with columns: date, code, open, high, low, close, volume.
+
+      Behavior
+      --------
+      1. Creates a temporary DataFrame containing each ticker and the start/end dates.
+      2. Calls get_combined_ohlcv to fetch and combine OHLCV data for all tickers.
+      3. Returns the resulting long-format DataFrame.
+      """
+      pdf = self.get_index_deposit(ticker, start_date, end_date)
+      df = self.get_combined_ohlcv(pdf)
+      return df

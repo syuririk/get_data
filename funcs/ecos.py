@@ -260,7 +260,7 @@ class EcosAPI:
 
         return pd.Timestamp(y, 1, 1)
 
-    def process_data_stat_search(self, data):
+    def process_data_stat_search(self, data=dict):
         """
         Process raw ECOS statistical API response data into a structured DataFrame
         and extract metadata describing the statistic.
