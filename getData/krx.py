@@ -1,4 +1,3 @@
-from pykrx import stock
 import pandas as pd
 import ast
 from datetime import datetime
@@ -7,12 +6,14 @@ class Krx:
     """
     class for KRX with PyKrx.
     """
-    
+
     def __init__(self):
         """
         Initialize the Krx class by fetching tickers, index tickers, and sector information.
         Sets the most recent business day.
         """
+        from pykrx import stock
+        
         self.KOSPI_stocks = stock.get_market_ticker_list(market="KOSPI")
         self.KOSDAQ_stocks = stock.get_market_ticker_list(market="KOSDAQ")
         self.KRX_stocks = stock.get_market_ticker_list(market="KONEX")
