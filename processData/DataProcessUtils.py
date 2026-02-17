@@ -24,7 +24,7 @@ def describe_df(df: pd.DataFrame) -> pd.DataFrame:
     "n_unique": df.nunique(),
   })
 
-    return summary_df
+  return summary_df
 
 
 def safe_div(numer: pd.Series, denom: pd.Series) -> pd.Series:
