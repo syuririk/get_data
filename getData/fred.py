@@ -54,23 +54,27 @@ class Fred():
       print(url)
       print(params)
 
+  
+
     if params is None:
       params = {}
 
     try:
-      response = requests.get(url, params, verify=False)
+      response = requests.get(url, params)
       response.raise_for_status()
     except requests.exceptions.HTTPError as err:
       print(f"HTTP error occurred: {err}")
 
     try:
-      data = response.json()
-    except:
-      raise Exception("Invalid JSON response")
+        data = response.json()
+    except ValueError as e:
+        raise Exception("Invalid JSON response") from e
 
-    if type(data) == NoneType:
-      data = {}
-      
+    if isinstance(data, dict) and data.get("error_code"):
+        raise Exception(data.get("error_message", "API error"))
+
+
+
     return data
 
 
@@ -121,8 +125,11 @@ class Fred():
         "file_type" : "json"
     }
     data = self.request(url, params=params)
-    result = data.get('categories')[0]
-    result['children'] = self.getChildren(category_id)
+    try:
+      result = data.get('categories')[0]
+      result['children'] = self.getChildren(category_id)
+    except:
+      result = data
     return result
 
 
@@ -304,3 +311,6 @@ class Fred():
     result = self.generateFredData(codes)
     result = pd.DataFrame(result)
     return result
+
+api_key = '62fdf3fd3002b7b3802b3401ce3800bf'
+fred = Fred(api_key=api_key)
