@@ -274,8 +274,11 @@ class Fred():
     }
 
     data = self.request(url, params=params)
+    data = pd.DataFrame(data.get('observations'))
+    
     data = data[['date', 'value']].rename(columns={'value':series_id})
-    return data.get('observations')
+    data = data.set_index("date")
+    return data
 
 
   def processFredData(self, df):
@@ -293,7 +296,7 @@ class Fred():
     pass
 
 
-  def getFredData(self, codes, release_date=False):
+  def getFredData(self, codes=list, release_date=False):
     """
     Retrieve observation data and convert to DataFrame.
 
@@ -312,15 +315,9 @@ class Fred():
     dfs = []
     for code in codes:
 
-      data = self.generateFredData(codes)
-      data = pd.DataFrame(data)
-      dfs.appned(data)
+      data = self.generateFredData(code)
+      dfs.append(data)
     result = pd.concat(dfs, axis=1)
-    
+    result.reset_index(inplace=True)
     return result
 
-
-
-
-api_key = '62fdf3fd3002b7b3802b3401ce3800bf'
-fred = Fred(api_key=api_key)
