@@ -1,4 +1,5 @@
 from .ecos import *
-from .krx import *
 from .fred import *
 
+# lazy import of krx 
+# from .krx import *
