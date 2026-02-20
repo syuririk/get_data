@@ -274,6 +274,7 @@ class Fred():
     }
 
     data = self.request(url, params=params)
+    data = data[['date', 'value']].rename(columns={'value':series_id})
     return data.get('observations')
 
 
@@ -308,9 +309,18 @@ class Fred():
     -------
     pandas.DataFrame
     """
-    result = self.generateFredData(codes)
-    result = pd.DataFrame(result)
+    dfs = []
+    for code in codes:
+
+      data = self.generateFredData(codes)
+      data = pd.DataFrame(data)
+      dfs.appned(data)
+    result = pd.concat(dfs, axis=1)
+    
     return result
+
+
+
 
 api_key = '62fdf3fd3002b7b3802b3401ce3800bf'
 fred = Fred(api_key=api_key)
