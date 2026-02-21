@@ -296,7 +296,7 @@ class Fred():
     pass
 
 
-  def getFredData(self, codes=list, release_date=False):
+  def getFredData(self, codes=list, release_date=False, start_date='20230101', end_date='20240101'):
     """
     Retrieve observation data and convert to DataFrame.
 
