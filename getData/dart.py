@@ -54,19 +54,19 @@ class dart:
     return df
 
   def searchCode(self, keywork, col='corp_name', search_type='eq'):
-  '''
-    col : corp_code	corp_name	corp_eng_name	stock_code	modify_date
-    type : eq, in
-  '''
-  if search_type == 'eq':
-    result = Dart.corpCode[Dart.corpCode[col]==keywork]
-  elif search_type == 'in':
-    result = self.corpCode[self.corpCode[col].str.contains(keywork, na=False)]
+    '''
+      col : corp_code	corp_name	corp_eng_name	stock_code	modify_date
+      type : eq, in
+    '''
+    if search_type == 'eq':
+      result = Dart.corpCode[Dart.corpCode[col]==keywork]
+    elif search_type == 'in':
+      result = self.corpCode[self.corpCode[col].str.contains(keywork, na=False)]
 
-  if len(result) == 1:
-    corp_code = df.loc[df[col] == keywork, 'corp_code'].iloc[0]
+    if len(result) == 1:
+      corp_code = df.loc[df[col] == keywork, 'corp_code'].iloc[0]
 
-  return result
+    return result
 
   def searchReportList(self, code, start_date, end_date, report_type='a001'):
     reports = dart_fss.filings.search(corp_code=code, bgn_de=start_date, end_de=end_date, pblntf_detail_ty=report_type)
